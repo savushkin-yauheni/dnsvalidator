@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 import concurrent.futures
-import dns.resolver
 import os
 import random
 import re
 import signal
 import string
 import sys
-import threading
-import time
-from typing import Set, List
+from typing import List
 
-from .lib.core.input import InputParser, InputHelper
-from .lib.core.output import OutputHelper, Level
+import dns.resolver
+
+from .lib.core.input import InputHelper, InputParser
+from .lib.core.output import Level, OutputHelper
 
 
 def rand():
@@ -30,9 +29,8 @@ output = OutputHelper(arguments)
 output.print_banner()
 base_dns_servers = ["1.1.1.1", "8.8.8.8", "9.9.9.9"]
 
-base_domains: List[str] = ["bet365.com", "telegram.com", "dev.by"]
-nxdomainchecks: List[str] = ["facebook.com", "paypal.com", "google.com",
-                             "bet365.com", "wikileaks.com"]
+base_domains: List[str] = ["bet365.com", "paypal.com"]
+nxdomainchecks: List[str] = ["facebook.com", "paypal.com", "google.com", "bet365.com", "wikileaks.org"]
 
 valid_servers = []
 base_dns_servers_responses = {}
@@ -87,7 +85,7 @@ def resolve_address(server: str):
         valid_servers.append(server)
     else:
         output.terminal(Level.REJECTED, server,
-                        f"invalid response received: {base_domains_dict} {current_dns_responses}")
+                        f"invalid response received: {base_dns_servers_responses} {current_dns_responses}")
 
 
 def main():
@@ -133,7 +131,7 @@ def main():
                 output.terminal(Level.ERROR, base_dns_server,
                                 f"Error when checking for base nx_domain, {nx_domain}")
                 nx_domain_unexpected_responses_counter[nx_domain] = nx_domain_unexpected_responses_counter.setdefault(
-                    nx_domain, 0)
+                    nx_domain, 0) + 1
 
         try:
             rand_subdomain = "{rand}.{domain}".format(
@@ -163,8 +161,8 @@ def main():
             if domain not in valid_domains_ips:
                 valid_domains_ips[domain] = domain_ips
             elif valid_domains_ips[domain] != domain_ips:
-                output.terminal(Level.ACCEPTED,
-                                f"base dns resolve domain differently {base_dns_servers_responses} {valid_domains_ips}")
+                output.terminal(Level.TEMP,
+                                f"base dns resolve domain differently {domain} {base_dns_servers_responses} {valid_domains_ips}")
                 sys.exit(6)
 
     # loop through the list

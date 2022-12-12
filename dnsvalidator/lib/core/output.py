@@ -21,7 +21,7 @@ class OutputHelper(object):
 
         print(self.seperator, flush=True)
         print("dnsvalidator v%s\tby James McLean (@vortexau) "
-              "\n                \t& Michael Skelton (@codingo_)", flush = True)
+              "\n                \t& Michael Skelton (@codingo_)", flush=True)
         print(self.seperator, flush=True)
 
     def terminal(self, level, target, message=""):
@@ -31,7 +31,7 @@ class OutputHelper(object):
         # print accepted hosts in silent mode and ignore all other content
         if self.silent:
             if level == 2:
-                print(target, flush = True)
+                print(target, flush=True)
             return
 
         formatting = {
@@ -45,10 +45,10 @@ class OutputHelper(object):
         leader = formatting.get(level, '[#]')
 
         format_args = {
-           'time': strftime("%H:%M:%S", localtime()),
-           'target': target,
-           'message': message,
-           'leader': leader
+            'time': strftime("%H:%M:%S", localtime()),
+            'target': target,
+            'message': message,
+            'leader': leader
         }
 
         # allows for leader/message printing in verbose mode without a target
@@ -57,9 +57,9 @@ class OutputHelper(object):
         else:
             template = '[{time}] {leader} [{target}] {message}'
 
-        print(template.format(**format_args), flush = True)
+        print(template.format(**format_args), flush=True)
 
-        if self.output and level == 2:
+        if self.output and (level == 2 or level == 5):
             f = open(self.output, 'a+')
             f.writelines("\n" + target)
             f.close()
@@ -71,3 +71,4 @@ class Level(IntEnum):
     ACCEPTED = 2
     REJECTED = 3
     ERROR = 4
+    TEMP = 5
