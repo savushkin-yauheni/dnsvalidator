@@ -152,7 +152,7 @@ class InputParser(object):
         parser.add_argument(
             '-threads', dest='threads', required=False,
             help="Specify the maximum number of threads to run (DEFAULT:5)",
-            default=5,
+            default=1,
             type=lambda x: InputHelper.check_positive(parser, x)
         )
 
